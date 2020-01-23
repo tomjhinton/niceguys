@@ -8,13 +8,29 @@ import './debug.js'
 // Load the model. Users optionally pass in a threshold and an array of
 // labels to include.
 
+const scoreDiv= document.getElementById('score')
+const over = document.getElementById('over')
 let arr = []
+let insults = []
+const form = document.getElementById('form')
+form.addEventListener('submit', function (e) {
+  e.preventDefault()
+})
 toxicity.load(threshold).then(model => {
-  const button = document.getElementById('button')
+  ready = true
   const input = document.getElementById('input')
-  button.addEventListener('click', function (e) {
+  form.addEventListener('submit', function (e) {
+    e.preventDefault()
     console.log(e)
-    analyse([input.value])
+
+    if(!insults.includes(input.value)){
+      analyse([input.value])
+    }
+    if(insults.includes(input.value)){
+      body.velocity.x+=5
+    }
+
+    insults.push(input.value)
     input.value=''
 
   })
@@ -68,7 +84,7 @@ const camera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHe
 camera.position.z = 30
 
 let world, body, shape, timeStep=1/60,
-   geometry, material, mesh, groundBody, floor, groundShape, platform,   platCanArr = [], platThreeArr = [],  score = 0, playerMaterial, playerContactMaterial, wallMaterial,   playing = true, version  = 0, totalScore = 0, start = false, ready= true
+   geometry, material, mesh, groundBody, floor, groundShape, platform,   platCanArr = [], platThreeArr = [],  score = 0, playerMaterial, playerContactMaterial, wallMaterial,   playing = true, totalScore = 0, start = false, ready= false
     world = new CANNON.World()
     world.gravity.set(0,-5,0)
     world.broadphase = new CANNON.NaiveBroadphase()
@@ -79,7 +95,7 @@ let world, body, shape, timeStep=1/60,
 
 
     playerContactMaterial = new CANNON.ContactMaterial(playerMaterial,wallMaterial)
-    playerContactMaterial.friction = 0
+    playerContactMaterial.friction = 0.3
     playerContactMaterial.restitution = 0.5
 
 
@@ -98,29 +114,19 @@ let world, body, shape, timeStep=1/60,
     world.addBody(body)
     body.position.y = 10
     geometry = new THREE.BoxGeometry( 2, 2, 2 )
-      material =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-        transparent: false } )
+material =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
+  transparent: false } )
 
 
       //BOX
 
-    mesh = new THREE.Mesh( geometry, material )
-    scene.add(mesh)
+mesh = new THREE.Mesh( geometry, material )
+scene.add(mesh)
 
 
 
       function createPlatform(x,y,z){
-        groundShape = new CANNON.Box(new CANNON.Vec3(10,10,1))
-        groundBody = new CANNON.Body({ mass: 0, material: wallMaterial })
-        groundBody.addShape(groundShape)
-        groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2)
-        groundBody.position.set(0,0,0)
-        groundBody.position.x = x
-        groundBody.position.y = y
-        groundBody.position.z = z
 
-        world.addBody(groundBody)
-        platCanArr.push(groundBody)
 
 
         platform = new THREE.BoxGeometry( 20, 20, 2 )
@@ -131,20 +137,34 @@ let world, body, shape, timeStep=1/60,
 
         platMesh.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2)
         platMesh.position.x = x
-        platMesh.position.y = y
-        platMesh.position.z = z
+  platMesh.position.y = y
+  platMesh.position.z = z
 
-        scene.add(platMesh)
-        platThreeArr.push(platMesh)
-      }
+  scene.add(platMesh)
+  platThreeArr.push(platMesh)
+}
+function createCanPlat(x,y,z){
+  groundShape = new CANNON.Box(new CANNON.Vec3(10,10,1))
+  groundBody = new CANNON.Body({ mass: 0, material: wallMaterial })
+  groundBody.addShape(groundShape)
+  groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2)
+  groundBody.position.set(0,0,0)
+  groundBody.position.x = x
+  groundBody.position.y = y
+  groundBody.position.z = z
 
+  world.addBody(groundBody)
+  platCanArr.push(groundBody)
 
-      createPlatform(0,0,0)
+}
 
-      for(let i=1;i<25;i ++ ){
-        createPlatform(0,i*20,0)
+createPlatform(0,0,0)
+createCanPlat(0,0,0)
 
-      }
+for(let i=1;i<50;i ++ ){
+  createPlatform(0,i*20,0)
+
+}
 var update = function() {
 
 
@@ -155,19 +175,61 @@ var update = function() {
 
   if(arr.length>0){
     console.log('works')
-    body.velocity.y+=10
+    body.velocity.y+=20
     arr = []
   }
 
 
 
-updatePhysics()
+  updatePhysics()
   if(cannonDebugRenderer){
-    cannonDebugRenderer.update()
+    //cannonDebugRenderer.update()
   }
 }
+document.onkeydown = checkKey
+
+
+
+function checkKey(e) {
+
+  e = e || window.event
+
+
+
+  if (e.keyCode === 82 &&!playing) {
+    playing = true
+
+
+    platCanArr.map(x=>{
+
+      world.remove(x)
+
+    } )
+
+    platCanArr = []
+    createCanPlat(0,0,0)
+    score = 0
+    body.position.y = 10
+    body.position.x = 0
+    body.position.z = 0
+    body.velocity.y = 0
+    body.velocity.x = 0
+    body.velocity.z = 0
+    over.innerHTML = ''
+    insults = []
+
+  }
+}
+
+
 const cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world )
 function animate() {
+  if(ready){
+  scoreDiv.innerText = 'SCORE: ' +`${platCanArr.length-1}`
+}
+if(!ready){
+scoreDiv.innerHTML = 'LOADING ... upset the computer to jump, try not to repeat yourself'
+}
 
   update()
   /* render scene and camera */
@@ -175,7 +237,26 @@ function animate() {
   mesh.quaternion.copy(body.quaternion)
   renderer.render(scene,camera)
   requestAnimationFrame(animate)
+  for(let i=platCanArr.length;i<platThreeArr.length;i++){
+    if(mesh.position.y-4>platThreeArr[i].position.y){
+      console.log(platThreeArr[i].position.y)
+      createCanPlat(0,platThreeArr[i].position.y,0)
+    }
+
+    if(mesh.position.y+4<platThreeArr[0].position.y){
+      playing = false
+      over.innerHTML = 'GAME OVER. R to Resest'
+    }
+
+
+
+
+
+  }
 }
+
+
+
 function updatePhysics() {
   // Step the physics world
   world.step(timeStep)
