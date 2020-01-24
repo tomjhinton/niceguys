@@ -33,12 +33,15 @@ input{
 #score{
   color:red;
   position: relative;
-  top:5vh;
+  top:10vh;
   left:5vh;
   z-index: 5;
   font-size: 3em;
   background-color: rgba(0,0,0,0);
+
 }
+
+
 
 #over{
   color:red;
@@ -59,12 +62,7 @@ button{
 
 }
 
-button:hover{
-  motion-path: path("m 0 0 m 10 0 m 0 10 m -10 0 m 0 -10");
-  offset-path: path("m 0 0 m 10 0 m 0 10 m -10 0 m 0 -10");
-  motion-rotation: reverse;
-  animation: move 3s linear infinite;
-}
+
 @keyframes move {
   100% {
     motion-offset: 100%;

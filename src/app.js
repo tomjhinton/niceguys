@@ -7,6 +7,13 @@ import Tone from 'tone'
 import './debug.js'
 // Load the model. Users optionally pass in a threshold and an array of
 // labels to include.
+var freeverb = new Tone.Freeverb().toMaster()
+freeverb.dampening.value = 25
+freeverb.roomSize.value = 0.7
+var pingPong = new Tone.PingPongDelay('4n', 0.2).toMaster()
+var autoWah = new Tone.AutoWah(50, 6, -30).toMaster()
+var synthA = new Tone.DuoSynth().chain(freeverb, pingPong, autoWah).toMaster()
+const notes = ['E4','F4','G4','A4','D4','E3','F3','G3','A3','D3']
 
 const scoreDiv= document.getElementById('score')
 const over = document.getElementById('over')
@@ -116,6 +123,13 @@ let world, body, shape, timeStep=1/60,
     body.angularDamping = 0.5
     world.addBody(body)
     body.position.y = 10
+    body.addEventListener('collide',function(e){
+
+      synthA.triggerAttackRelease(notes[Math.floor(Math.random()*9)],1)
+
+
+    }
+  )
     geometry = new THREE.BoxGeometry( 2, 2, 2 )
 material =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
   transparent: false } )
