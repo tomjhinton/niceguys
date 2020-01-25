@@ -95,69 +95,48 @@ camera.position.z = 30
 
 let world, body, shape, timeStep=1/60,
    geometry, material, material2, material3, material4, material5, material6, mesh, groundBody, floor, groundShape, platform,   platCanArr = [], platThreeArr = [],  score = 0, playerMaterial, playerContactMaterial, wallMaterial,   playing = true, totalScore = 0, start = false, ready= false
-    world = new CANNON.World()
-    world.gravity.set(0,-5,0)
-    world.broadphase = new CANNON.NaiveBroadphase()
-    world.solver.iterations = 10
 
-    wallMaterial = new CANNON.Material('wallMaterial')
-    playerMaterial = new CANNON.Material('playerMaterial')
+world = new CANNON.World()
+world.gravity.set(0,-5,0)
+world.broadphase = new CANNON.NaiveBroadphase()
+world.solver.iterations = 10
 
-
-    playerContactMaterial = new CANNON.ContactMaterial(playerMaterial,wallMaterial)
-    playerContactMaterial.friction = 0.3
-    playerContactMaterial.restitution = 0.5
+wallMaterial = new CANNON.Material('wallMaterial')
+playerMaterial = new CANNON.Material('playerMaterial')
 
 
-    world.addContactMaterial(playerContactMaterial)
-    shape = new CANNON.Box(new CANNON.Vec3(1,1,1))
+playerContactMaterial = new CANNON.ContactMaterial(playerMaterial,wallMaterial)
+playerContactMaterial.friction = 0.3
+playerContactMaterial.restitution = 0.5
 
 
+world.addContactMaterial(playerContactMaterial)
+shape = new CANNON.Box(new CANNON.Vec3(1,1,1))
 
-    body = new CANNON.Body({
-      mass: 1, material: playerMaterial
-    })
+function randomMat(){
+  return new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
+    transparent: true } )
+}
 
-    body.addShape(shape)
-    body.angularVelocity.set(0,0,0)
-    body.angularDamping = 0.5
-    world.addBody(body)
-    body.position.y = 10
+body = new CANNON.Body({
+  mass: 1, material: playerMaterial
+})
+
+body.addShape(shape)
+body.angularVelocity.set(0,0,0)
+body.angularDamping = 0.5
+world.addBody(body)
+body.position.y = 10
 body.addEventListener('collide',function(e){
 
   synthA.triggerAttackRelease(notes[Math.floor(Math.random()*9)],1)
-    mesh.material = [new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-      transparent: false } ),new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-        transparent: false } ),new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-          transparent: false } ),new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-            transparent: false } ),new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-              transparent: false } ),new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-                transparent: false } )]
+  mesh.material = [randomMat(),randomMat(),randomMat(),randomMat(),randomMat(),randomMat()]
 
-    }
-  )
-    geometry = new THREE.BoxGeometry( 2, 2, 2 )
-material =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-  transparent: false } )
-  material2 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-    transparent: true } )
+})
 
-    material3 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-      transparent: true } )
 
-  platform = new THREE.BoxGeometry( 20, 20, 2 )
-      material4 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-        transparent: true } )
-
-        material5 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-          transparent: true } )
-
-          material6 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-            transparent: true } )
-
-      //BOX
-
-mesh = new THREE.Mesh( geometry, [material, material2, material3, material4, material5, material6 ] )
+geometry = new THREE.BoxGeometry( 2, 2, 2 )
+mesh = new THREE.Mesh( geometry, [randomMat(),randomMat(),randomMat(),randomMat(),randomMat(),randomMat()] )
 scene.add(mesh)
 
 
@@ -166,30 +145,13 @@ function createPlatform(x,y,z){
 
 
 
-        platform = new THREE.BoxGeometry( 20, 20, 2 )
-        material =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-          transparent: true } )
+  platform = new THREE.BoxGeometry( 20, 20, 2 )
 
-          material2 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-            transparent: true } )
 
-            material3 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-              transparent: true } )
+  const platMesh = new THREE.Mesh( platform, [randomMat(),randomMat(),randomMat(),randomMat(),randomMat(),randomMat()])
 
-          platform = new THREE.BoxGeometry( 20, 20, 2 )
-              material4 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-                transparent: true } )
-
-                material5 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-                  transparent: true } )
-
-                  material6 =  new THREE.MeshPhongMaterial( { color: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)`, specular: `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},1)` , shininess: 100, side: THREE.DoubleSide, opacity: 0.8,
-                    transparent: true } )
-
-        const platMesh = new THREE.Mesh( platform, [material, material2, material3, material4, material5, material6 ])
-
-        platMesh.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2)
-        platMesh.position.x = x
+  platMesh.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2)
+  platMesh.position.x = x
   platMesh.position.y = y
   platMesh.position.z = z
 
@@ -278,11 +240,11 @@ function checkKey(e) {
 const cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world )
 function animate() {
   if(ready){
-  scoreDiv.innerText = 'SCORE: ' +`${platCanArr.length-1}`
-}
-if(!ready){
-scoreDiv.innerHTML = 'LOADING ... upset the computer to jump, try not to repeat yourself'
-}
+    scoreDiv.innerText = 'SCORE: ' +`${platCanArr.length-1}`
+  }
+  if(!ready){
+    scoreDiv.innerHTML = 'LOADING ... upset the computer to jump, try not to repeat yourself'
+  }
 
   update()
   /* render scene and camera */
