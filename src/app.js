@@ -5,8 +5,8 @@ const CANNON = require('cannon')
 const THREE = require('three')
 import Tone from 'tone'
 import './debug.js'
-// Load the model. Users optionally pass in a threshold and an array of
-// labels to include.
+
+
 var freeverb = new Tone.Freeverb().toMaster()
 freeverb.dampening.value = 25
 freeverb.roomSize.value = 0.7
@@ -79,7 +79,6 @@ toxicity.load(threshold).then(model => {
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0xffffff)
-scene.fog = new THREE.Fog(0x6a99ee, 500, 1000)
 
 const light = new THREE.DirectionalLight( 0xffffff )
 light.position.set( 40, 25, 10 )
@@ -94,7 +93,10 @@ const camera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHe
 camera.position.z = 30
 
 let world, body, shape, timeStep=1/60,
-   geometry, material, material2, material3, material4, material5, material6, mesh, groundBody, floor, groundShape, platform,   platCanArr = [], platThreeArr = [],  score = 0, playerMaterial, playerContactMaterial, wallMaterial,   playing = true, totalScore = 0, start = false, ready= false
+   geometry, material, material2, material3, material4, material5, material6, mesh, groundBody, floor, groundShape, platform,   platCanArr = [], platThreeArr = [],  playerMaterial, playerContactMaterial, wallMaterial,   playing = true, ready= false
+
+
+
 
 world = new CANNON.World()
 world.gravity.set(0,-5,0)
@@ -223,13 +225,18 @@ function checkKey(e) {
 
     platCanArr = []
     createCanPlat(0,0,0)
-    score = 0
+    body.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2)
+    body.velocity.y = 0
+    body.velocity.x = 0
+    body.angularVelocity.z = 0
+    body.angularVelocity.y = 0
+    body.angularVelocity.x = 0
+    body.velocity.z = 0
     body.position.y = 10
     body.position.x = 0
     body.position.z = 0
-    body.velocity.y = 0
-    body.velocity.x = 0
-    body.velocity.z = 0
+
+
     over.innerHTML = ''
     insults = []
 
