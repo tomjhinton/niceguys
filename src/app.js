@@ -5,6 +5,7 @@ const CANNON = require('cannon')
 const THREE = require('three')
 import Tone from 'tone'
 import './debug.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 
 var freeverb = new Tone.Freeverb().toMaster()
@@ -88,10 +89,10 @@ const renderer = new THREE.WebGLRenderer()
 renderer.setSize( window.innerWidth, (window.innerHeight /100)*75)
 const screen = document.getElementById('three')
 screen.appendChild( renderer.domElement )
-//var controls = new OrbitControls( camera, renderer.domElement );
+
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 3000 )
 camera.position.z = 30
-
+//var controls = new OrbitControls( camera, renderer.domElement );
 let world, body, shape, timeStep=1/60,
    geometry, material, material2, material3, material4, material5, material6, mesh, groundBody, floor, groundShape, platform,   platCanArr = [], platThreeArr = [],  playerMaterial, playerContactMaterial, wallMaterial,   playing = true, ready= false
 
